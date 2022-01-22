@@ -2,7 +2,7 @@
 
 import wpilib
 import wpilib.drive
-
+import rev
 
 class MyRobot(wpilib.TimedRobot):
     """Main robot class"""
@@ -13,8 +13,11 @@ class MyRobot(wpilib.TimedRobot):
         self.lstick = wpilib.Joystick(0)
         self.rstick = wpilib.Joystick(1)
 
-        self.l_motor = wpilib.Jaguar(1)
-        self.r_motor = wpilib.Jaguar(2)
+        # self.l_motor = wpilib.Jaguar(1)
+        # self.r_motor = wpilib.Jaguar(2)
+
+        self.l_motor = rev.CANSparkMax(1, rev.CANSparkMaxLowLevel.MotorType.kBrushed)
+        self.r_motor = rev.CANSparkMax(2, rev.CANSparkMaxLowLevel.MotorType.kBrushed)
 
         # Position gets automatically updated as robot moves
         self.gyro = wpilib.AnalogGyro(1)
