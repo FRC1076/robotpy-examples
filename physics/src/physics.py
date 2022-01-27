@@ -14,6 +14,7 @@ import wpilib.simulation
 from pyfrc.physics.core import PhysicsInterface
 from pyfrc.physics import motor_cfgs, tankmodel
 from pyfrc.physics.units import units
+import pprint
 
 class PhysicsEngine:
     """
@@ -27,8 +28,13 @@ class PhysicsEngine:
         self.physics_controller = physics_controller
 
         # Motors
-        self.l_motor = wpilib.simulation.PWMSim(1)
-        self.r_motor = wpilib.simulation.PWMSim(2)
+        self.l_motor = wpilib.simulation.SimDeviceSim("SPARK MAX [1]")
+        self.r_motor = wpilib.simulation.SimDeviceSim("SPARK MAX [2]")
+
+        # print("devices:", wpilib.simulation.SimDeviceSim.enumerateDevices())
+
+        self.l_mc = self.l_motor.getDouble("Motor Current")
+        self.r_mc = self.r_motor.getDouble("Motor Current")
 
         self.dio1 = wpilib.simulation.DIOSim(1)
         self.dio2 = wpilib.simulation.DIOSim(2)
@@ -64,14 +70,20 @@ class PhysicsEngine:
 
         :param now: The current time as a float
         :param tm_diff: The amount of time that has passed since the last
-                        time that this function was called
+        time that this function was called
         """
 
         # Simulate the drivetrain
-        l_motor = self.l_motor.getSpeed()
-        r_motor = self.r_motor.getSpeed()
+        l_mc = self.l_mc.get()
+        r_mc = self.r_mc.get()
 
-        transform = self.drivetrain.calculate(l_motor, r_motor, tm_diff)
+        print('motor current:', l_mc, r_mc)
+        # v = sm.getDouble("Motor Current")
+        # v.value = 42
+        # print("Motor current is", m.getOutputCurrent())
+
+
+        transform = self.drivetrain.calculate(l_mc, r_mc, tm_diff)
         pose = self.physics_controller.move_robot(transform)
 
         # Update the gyro simulation
