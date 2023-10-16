@@ -14,7 +14,7 @@ from wpilib.simulation import (
     PWMSim,
     DifferentialDrivetrainSim,
     EncoderSim,
-    ADXRS450_GyroSim,
+    AnalogGyroSim,
 )
 from wpimath.system import LinearSystemId
 from wpimath.system.plant import DCMotor
@@ -22,6 +22,11 @@ from wpimath.system.plant import DCMotor
 import constants
 
 from pyfrc.physics.core import PhysicsInterface
+
+import typing
+
+if typing.TYPE_CHECKING:
+    from robot import MyRobot
 
 
 class PhysicsEngine:
@@ -31,8 +36,7 @@ class PhysicsEngine:
     realistic, but it's good enough to illustrate the point
     """
 
-    def __init__(self, physics_controller: PhysicsInterface):
-
+    def __init__(self, physics_controller: PhysicsInterface, robot: "MyRobot"):
         self.physics_controller = physics_controller
 
         # Motor simulation definitions. Each correlates to a motor defined in
@@ -64,14 +68,10 @@ class PhysicsEngine:
             (constants.kWheelDiameterMeters / 2),
         )
 
-        self.leftEncoderSim = EncoderSim.createForChannel(
-            constants.kLeftEncoderPorts[0]
-        )
-        self.rightEncoderSim = EncoderSim.createForChannel(
-            constants.kRightEncoderPorts[0]
-        )
+        self.leftEncoderSim = EncoderSim(robot.container.robotDrive.leftEncoder)
+        self.rightEncoderSim = EncoderSim(robot.container.robotDrive.rightEncoder)
 
-        self.gyro = ADXRS450_GyroSim(ADXRS450_Gyro())
+        self.gyro = AnalogGyroSim(robot.container.robotDrive.gyro)
 
     def update_sim(self, now: float, tm_diff: float) -> None:
         """

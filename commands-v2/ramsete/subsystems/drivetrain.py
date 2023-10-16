@@ -1,6 +1,6 @@
 from commands2 import SubsystemBase
 
-from wpilib import SpeedControllerGroup, PWMSparkMax, Encoder, ADXRS450_Gyro
+from wpilib import MotorControllerGroup, PWMSparkMax, Encoder, AnalogGyro
 from wpilib.drive import DifferentialDrive
 
 from wpimath.geometry import Pose2d, Rotation2d
@@ -11,16 +11,15 @@ import constants
 
 class Drivetrain(SubsystemBase):
     def __init__(self):
-
         super().__init__()
 
         # Create the motor controllers and their respective speed controllers.
-        self.leftMotors = SpeedControllerGroup(
+        self.leftMotors = MotorControllerGroup(
             PWMSparkMax(constants.kLeftMotor1Port),
             PWMSparkMax(constants.kLeftMotor2Port),
         )
 
-        self.rightMotors = SpeedControllerGroup(
+        self.rightMotors = MotorControllerGroup(
             PWMSparkMax(constants.kRightMotor1Port),
             PWMSparkMax(constants.kRightMotor2Port),
         )
@@ -47,11 +46,15 @@ class Drivetrain(SubsystemBase):
 
         # Create the gyro, a sensor which can indicate the heading of the robot relative
         # to a customizable position.
-        self.gyro = ADXRS450_Gyro()
+        self.gyro = AnalogGyro(1)
 
         # Create the an object for our odometry, which will utilize sensor data to
         # keep a record of our position on the field.
-        self.odometry = DifferentialDriveOdometry(self.gyro.getRotation2d())
+        self.odometry = DifferentialDriveOdometry(
+            self.gyro.getRotation2d(),
+            self.leftEncoder.getDistance(),
+            self.rightEncoder.getDistance(),
+        )
 
         # Reset the encoders upon the initilization of the robot.
         self.resetEncoders()
@@ -79,9 +82,14 @@ class Drivetrain(SubsystemBase):
         return speeds
 
     def resetOdometry(self, pose):
-        """ Resets the robot's odometry to a given position."""
+        """Resets the robot's odometry to a given position."""
         self.resetEncoders()
-        self.odometry.resetPosition(pose, self.gyro.getRotation2d())
+        self.odometry.resetPosition(
+            self.gyro.getRotation2d(),
+            self.leftEncoder.getDistance(),
+            self.rightEncoder.getDistance(),
+            pose,
+        )
 
     def arcadeDrive(self, fwd, rot):
         """Drive the robot with standard arcade controls."""

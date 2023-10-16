@@ -2,9 +2,11 @@ from commands2 import RunCommand, RamseteCommand
 from commands2.button import JoystickButton, Button
 
 from wpilib import XboxController
-from wpilib.controller import RamseteController, PIDController
-
-from wpimath.controller import SimpleMotorFeedforwardMeters
+from wpimath.controller import (
+    RamseteController,
+    PIDController,
+    SimpleMotorFeedforwardMeters,
+)
 
 from wpimath.kinematics import ChassisSpeeds
 
@@ -29,7 +31,6 @@ class RobotContainer:
     """
 
     def __init__(self):
-
         # Create the driver's controller.
         self.driverController = XboxController(constants.kDriverControllerPort)
 
@@ -144,9 +145,7 @@ class RobotContainer:
         # define a variable.
 
         (
-            JoystickButton(
-                self.driverController, XboxController.Button.kBumperRight.value
-            )
+            JoystickButton(self.driverController, XboxController.Button.kRightBumper)
             .whenPressed(lambda: self.robotDrive.setSlowMaxOutput(0.5))
             .whenReleased(lambda: self.robotDrive.setNormalMaxOutput(1))
         )

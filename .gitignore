@@ -5,11 +5,15 @@ __pycache__
 
 .vscode/
 .deploy_cfg
+deploy.json
 
 .project
 .pydevproject
 
 imgui.ini
+simgui*.json
 
 opkg_cache
 pip_cache
+
+networktables.*

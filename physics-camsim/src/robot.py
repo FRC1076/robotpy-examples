@@ -5,7 +5,7 @@ import math
 import wpilib
 
 import wpilib.drive
-import wpilib.controller
+import wpimath.controller
 
 from networktables.util import ntproperty
 
@@ -62,7 +62,7 @@ class MyRobot(wpilib.TimedRobot):
         self.gyro = wpilib.AnalogGyro(0)
 
         # Use PIDController to control angle
-        turnController = wpilib.controller.PIDController(
+        turnController = wpimath.controller.PIDController(
             self.kP, self.kI, self.kD, self.kF
         )
         turnController.setTolerance(self.kToleranceDegrees)
@@ -90,7 +90,6 @@ class MyRobot(wpilib.TimedRobot):
         # if trigger is pressed, then center the robot to the camera target
 
         if self.stick.getRawButton(6):
-
             found, timestamp, offset = self.target
             turnSpeed = 0.0
 

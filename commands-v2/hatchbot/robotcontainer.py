@@ -26,7 +26,6 @@ class RobotContainer:
     """
 
     def __init__(self) -> None:
-
         # The driver's controller
         # self.driverController = wpilib.XboxController(constants.kDriverControllerPort)
         self.driverController = wpilib.Joystick(constants.kDriverControllerPort)
@@ -61,8 +60,8 @@ class RobotContainer:
         self.drive.setDefaultCommand(
             DefaultDrive(
                 self.drive,
-                lambda: -self.driverController.getY(GenericHID.Hand.kLeftHand),
-                lambda: self.driverController.getX(GenericHID.Hand.kLeftHand),
+                lambda: -self.driverController.getY(),
+                lambda: self.driverController.getX(),
             )
         )
 

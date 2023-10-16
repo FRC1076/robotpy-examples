@@ -2,75 +2,67 @@
 
 cd "$(dirname $0)"
 
+# Keep this list alphabetically sorted
 BASE_TESTS="
+  addressableled
   arcade-drive
+  arm-simulation
+  commands-v2/armbot
+  commands-v2/armbotoffboard
+  commands-v2/drive-distance-offboard
+  commands-v2/frisbee-bot
+  commands-v2/gyro-drive-commands
+  commands-v2/hatchbot
+  commands-v2/hatchbot-inlined
+  commands-v2/ramsete
+  commands-v2/scheduler-event-logging
+  commands-v2/selectcommand
   cscore-intermediate-vision
   cscore-quick-vision
+  elevator-profiled-pid
+  elevator-simulation
+  elevator-trapezoid-profile
   game-data
   getting-started
   gyro
+  magicbot-simple
   mecanum-drive
   mecanum-driveXbox
+  mechanism2d
   motor-control
+  physics/src
+  physics-4wheel/src
+  physics-mecanum/src
+  physics-spi/src
+  shuffleboard
+  stateful-autonomous
+  state-space-flywheel
   tank-drive
   timed/src
 "
 
-ROBOTPY_EXT_TESTS="
-  magicbot-simple
-"
-
-NAVX_TESTS="
-  navx
-  navx-rotate-to-angle
-  navx-rotate-to-angle-arcade
-"
-
 IGNORED_TESTS="
-  stateful-autonomous
-  physics-pathfinder
-  physics/src
-  physics-4wheel/src
+  commands-v2/romi
   physics-camsim/src
-  physics-mecanum/src
-  physics-spi/src
-  shuffleboard
-  command-based
-  gearsbot
-  pacgoat
 "
 
-ALL_TESTS="${BASE_TESTS} ${ROBOTPY_EXT_TESTS}"
-EVERY_TESTS="${ALL_TESTS} ${IGNORED_TESTS} ${NAVX_TESTS}"
+ALL_TESTS="${BASE_TESTS}"
+EVERY_TESTS="${ALL_TESTS} ${IGNORED_TESTS}"
+TESTS="${ALL_TESTS}"
 
-if [ "$1" == "all" ]; then
-  TESTS="$ALL_TESTS"
-elif [ "$1" == "base" ]; then
-  TESTS="$BASE_TESTS"
-elif [ "$1" == "ext" ]; then
-  TESTS="$ROBOTPY_EXT_TESTS"
-elif [ "$1" == "navx" ]; then
-  TESTS="$NAVX_TESTS"
-else
-  echo "Usage: run_tests.sh all|base|ext|navx"
-  exit 1
-fi
+TMPD=$(mktemp -d)
+trap 'rm -rf "$TMPD"' EXIT
 
 # Ensure that when new samples are added, they are added to the list of things
 # to test. Otherwise, exit.
-EVERY_TESTS=$(for i in ${EVERY_TESTS}; do
+for i in ${EVERY_TESTS}; do
   echo ./$i/robot.py
-done | sort)
+done | sort > $TMPD/a
 
-FOUND_TESTS=$(find . -name robot.py | sort)
+find . -name robot.py | sort > $TMPD/b
 
-if [ "$EVERY_TESTS" != "$FOUND_TESTS" ]; then
-  echo "Specified:"
-  echo "$EVERY_TESTS"
-  echo
-  echo "Found:"
-  echo "$FOUND_TESTS"
-  echo
+if ! diff -u $TMPD/a $TMPD/b; then
+
   if [ -z "$FORCE_ANYWAYS" ]; then
     echo "ERROR: Not every robot.py file is in the list of tests!"
     exit 1
